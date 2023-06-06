@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        display: grid;
+        place-items: center;
+        padding-inline: 30vw;
+      }
+
+      .form {
+        margin-top: 20rem;
+        display: grid;
+      }
+      label {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+      #location-input {
+        font-size: 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid gray;
+        padding: 0.3rem;
+      }
+      .button {
+        color: aliceblue;
+        background: #051245;
+        font-size: 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid gray;
+        padding: 0.3rem;
+      }
+      .weather {
+        font-size: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form">
+      <label for="location-input">Type in a Location:</label>
+      <div>
+        <input id="location-input" pattern="[a-zA-Z]+" type="text" required />
+        <button class="button">confirm</button>
+      </div>
+    </div>
+    <p class="weather"></p>
+    <script>
+      const locationInput = document.querySelector("#location-input");
+      const button = document.querySelector(".button");
+      const weatherP = document.querySelector(".weather");
+
+      function getWeather(location) {
+        return new Promise(function (resolve, reject) {
+          fetch(
+            `https://api.weatherapi.com/v1/current.json?key=70fd678c948f4e318e2163143231404&q=${location}`
+          )
+            .then((resp) => resp.json())
+            .then((data) => {
+              console.log(data);
+              resolve(data);
+            });
+        });
+      }
+
+      function logWeather(weather) {
+        weatherP.innerText = `At the Time (${weather.current.last_updated} on site) the weather in ${weather.location.name} is ${weather.current.condition.text} and the temperature is ${weather.current.temp_c} degrees`;
+      }
+
+      function logError(err) {
+        weatherP.innerText = "Input has to be a valid location";
+      }
+
+      button.addEventListener("click", () => {
+        Promise.all([getWeather(locationInput.value)])
+          .then((weather) => {
+            weather.forEach(logWeather);
+          })
+          .catch(logError);
+      });
+    </script>
+  </body>
+</html>
